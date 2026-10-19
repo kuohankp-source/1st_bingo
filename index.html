@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第一屆賓果爭霸戰</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3F1EC; --card:#FFFFFF; --ink:#16212E; --muted:#5E6B78; --line:#D9D5CB;
+  --b:#2F6FDE; --i:#D62839; --n:#16212E; --g:#1E9E6A; --o:#F08A1C;
+  --live:#1E9E6A; --wait:#B26A00; --won:#2F6FDE; --soon:#5E6B78;
+  --radius:14px;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  line-height:1.65;-webkit-text-size-adjust:100%}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
+a{color:var(--b)}
+:focus-visible{outline:3px solid var(--o);outline-offset:2px}
+
+/* ---------- hero ---------- */
+header.hero{background:var(--ink);color:#fff;padding:28px 0 26px}
+.hero h1{margin:0;font-size:clamp(28px,6vw,46px);font-weight:900;letter-spacing:.02em;line-height:1.2}
+.hero p.sub{margin:6px 0 0;color:#C9D2DC;font-size:clamp(15px,3.4vw,18px)}
+.board-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:22px 0 10px;flex-wrap:wrap}
+.board-head strong{font-size:16px;font-weight:700}
+.board-head span{color:#C9D2DC;font-size:14px}
+.board{display:grid;gap:6px}
+.brow{display:grid;grid-template-columns:28px 1fr;gap:6px;align-items:center}
+.bletter{font-family:Fredoka,sans-serif;font-weight:700;font-size:20px;text-align:center}
+.bnums{display:grid;grid-template-columns:repeat(15,1fr);gap:3px}
+.ball{aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  font-family:Fredoka,"Noto Sans TC",sans-serif;font-weight:500;font-size:clamp(9px,2.5vw,15px);
+  color:#6F7D8B;border:1px solid #33465A;background:transparent;transition:background .3s}
+.ball.on{color:#fff;font-weight:700;border-color:transparent;background:var(--c)}
+.ball.last{outline:3px solid #fff;outline-offset:2px;transform:scale(1.12)}
+.brow[data-l=B]{--c:var(--b)} .brow[data-l=I]{--c:var(--i)}
+.brow[data-l=N]{--c:#5E6B78} .brow[data-l=G]{--c:var(--g)} .brow[data-l=O]{--c:var(--o)}
+.brow[data-l=B] .bletter{color:#7DA8F5}.brow[data-l=I] .bletter{color:#F27A87}
+.brow[data-l=N] .bletter{color:#C9D2DC}.brow[data-l=G] .bletter{color:#5ED0A0}.brow[data-l=O] .bletter{color:#F8B565}
+.lastcall{margin-top:12px;color:#C9D2DC;font-size:14px}
+.lastcall b{font-family:Fredoka,sans-serif;font-size:20px;color:#fff}
+
+/* ---------- tasks ---------- */
+main{padding:26px 0 40px}
+.tools{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+h2{margin:0;font-size:22px;font-weight:900}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{font:inherit;font-size:14px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--ink);
+  background:transparent;color:var(--ink);cursor:pointer;min-height:36px}
+.tab[aria-pressed=true]{background:var(--ink);color:#fff}
+
+#tasks .grp{display:flex;align-items:center;gap:8px;margin:20px 0 10px;font-size:16px;font-weight:700}
+#tasks .grp:first-child{margin-top:4px}
+#tasks .grp::before{content:"";width:6px;height:18px;border-radius:3px;background:var(--soon)}
+#tasks .grp.live::before{background:var(--live)}#tasks .grp.wait::before{background:var(--wait)}#tasks .grp.won::before{background:var(--won)}
+#tasks .grp span{font-weight:400;font-size:13px;color:var(--muted)}
+.ticket{display:grid;grid-template-columns:96px 1fr;background:var(--card);border-radius:var(--radius);
+  margin-bottom:12px;position:relative;box-shadow:0 1px 0 rgba(22,33,46,.08)}
+.stub{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 8px;
+  border-right:2px dashed var(--line);position:relative}
+.stub::before,.stub::after{content:"";position:absolute;right:-9px;width:16px;height:16px;border-radius:50%;background:var(--paper)}
+.stub::before{top:-8px}.stub::after{bottom:-8px}
+.tid{font-family:Fredoka,sans-serif;font-weight:700;font-size:26px;line-height:1;color:var(--c,var(--ink))}
+.ticket[data-series=A]{--c:var(--b)} .ticket[data-series=B]{--c:var(--i)}
+.ticket[data-series=C]{--c:var(--g)} .ticket[data-series=D]{--c:var(--o)}
+.badge{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;color:#fff;white-space:nowrap}
+.badge.live{background:var(--live)} .badge.wait{background:var(--wait)}
+.badge.won{background:var(--won)} .badge.soon{background:var(--soon)}
+.body{padding:14px 18px 14px}
+.body h3{margin:0 0 6px;font-size:17px;font-weight:700;line-height:1.5}
+.meta{display:flex;flex-wrap:wrap;gap:4px 16px;color:var(--muted);font-size:14px}
+.winners{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
+.winners .lab{color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:8px;background:var(--paper);border-radius:999px;padding:3px 4px 3px 12px;font-weight:700}
+.chip i{font-style:normal;font-family:Fredoka,sans-serif;background:var(--ink);color:#fff;border-radius:999px;padding:0 10px;min-width:28px;text-align:center}
+.nowin{color:var(--muted)}
+.pending{font-style:normal;font-weight:400;font-size:12px;color:var(--muted);padding-right:8px}
+details{margin-top:8px}
+summary{cursor:pointer;color:var(--b);font-size:14px;min-height:28px}
+details ul{margin:6px 0 0;padding-left:20px;font-size:14px;color:var(--ink)}
+.state{padding:28px 16px;text-align:center;color:var(--muted);background:var(--card);border-radius:var(--radius)}
+.err{color:#B3261E}
+.demo{background:#FFF3D6;color:#6B4A00;border-radius:10px;padding:8px 14px;font-size:14px;margin-bottom:14px}
+
+/* ---------- rules ---------- */
+section.rules{background:var(--card);border-radius:var(--radius);padding:20px 20px 8px;margin-top:28px}
+section.rules h2{margin-bottom:10px}
+section.rules h4{margin:16px 0 4px;font-size:16px}
+section.rules p,section.rules li{font-size:15px;max-width:68ch}
+footer{color:var(--muted);font-size:13px;padding:0 0 32px}
+
+@media (max-width:520px){
+  .ticket{grid-template-columns:76px 1fr}
+  .tid{font-size:22px}
+  .body{padding:12px 12px}
+  .bnums{gap:2px}
+  .brow{grid-template-columns:20px 1fr;gap:4px}
+  .bletter{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>第一屆賓果爭霸戰</h1>
+    <p class="sub">開獎號碼由你決定，獎金全拿！</p>
+    <div class="board-head"><strong>叫號板</strong><span id="callCount">已叫 0 / 75</span></div>
+    <div class="board" id="board" aria-label="已叫號碼板"></div>
+    <div class="lastcall" id="lastCall"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="demoNote" class="demo" hidden>目前顯示的是範例資料。把試算表連結填進 CONFIG 後，這裡就會顯示真實內容。</div>
+  <div class="tools">
+    <h2>叫號任務</h2>
+    <div class="tabs" role="group" aria-label="篩選任務">
+      <button class="tab" data-f="all" aria-pressed="true">全部</button>
+      <button class="tab" data-f="live" aria-pressed="false">進行中</button>
+      <button class="tab" data-f="wait" aria-pressed="false">待叫號</button>
+      <button class="tab" data-f="won" aria-pressed="false">已叫號</button>
+    </div>
+  </div>
+  <div id="tasks"><div class="state">載入中…</div></div>
+
+  <section class="rules" id="rules">
+    <h2>活動說明</h2>
+    <h4>別本末倒置</h4>
+    <p>賓果爭霸戰是為了替工作增加一點樂趣。任務反映老闆的期望，例如讓客人更肯定我們、拿到更多有效員點。請把正職工作做好，不要為了完成任務走偏門，例如對每位客人都硬推高價帽款，或忽略正要買騎士帽的客人。把銷售技巧練好、讓客人信任你，叫號權自然會來。</p>
+    <h4>多益單字測驗（B 系列任務）</h4>
+    <ul>
+      <li>日常背單字：用自己的手機、平板或電腦開啟「多益單詞庫」，不用登入，不限地點。</li>
+      <li>店內極限挑戰：只能用店內專用平板登入。作答時個人手機與店內手機都要放在碰不到的地方。</li>
+      <li>隨機抽 10 題，單字 10 個字母以下限時 15 秒，11 個字母以上限時 20 秒。</li>
+      <li>作答中切換分頁、跳出視窗或鎖定螢幕，該次測驗會判定作廢且不計分。</li>
+      <li>錯題會進入「個人複習中心」，可反覆特訓直到清空。</li>
+    </ul>
+    <h4>徵求單字</h4>
+    <p>每位同仁可在 2026/10/18 前傳最多 10 個單字給店長，老闆確認符合多益範圍後會加入單字庫。</p>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div id="updated"></div>
+  <div>資料來自店內公布的叫號紀錄，約每 5 分鐘更新一次。</div>
+</footer>
+
+<script>
+(function(){
+  function show(msg){
+    var t=document.getElementById("tasks"); if(!t) return;
+    t.innerHTML='<div class="state err">'+msg+'</div>';
+  }
+  window.addEventListener("error",function(e){ show("頁面程式發生錯誤："+(e.message||"未知錯誤")+"。請檢查 index.html 的 CONFIG 區，網址要放在英文直引號 \" \" 之間。"); });
+  setTimeout(function(){
+    var t=document.getElementById("tasks");
+    if(t && t.textContent.trim()==="載入中…") show("載入逾時。請確認試算表已「發佈到網路」，連結是 CSV 格式，而且 CONFIG 裡的網址完整貼上。");
+  },10000);
+})();
+</script>
+<script>
+/* =========================================================
+   設定區：只需要改這裡
+   ========================================================= */
+const CONFIG = {
+  // 方案 A（建議先用）：試算表「發佈到網路」→ CSV 連結，貼在這裡
+  CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ61LAZUmE1SQB9dalxGnwb7EvEn4LNFsDO2H50wytAPSVTJ_L-WCHL86cPADyP02jBYH-0qQMBBKK2/pub?gid=832065208&single=true&output=csv",
+  // 方案 B：Apps Script 部署後的網頁應用程式網址（結尾是 /exec）
+  JSON_URL: "",
+  // 沒填連結時顯示範例資料
+  USE_DEMO_WHEN_EMPTY: true
+};
+
+/* 試算表沒有「任務內容」欄時，用公告文件的內容補上 */
+const FALLBACK = {
+  A01:{title:"當週單班次獲得「最多」有效員點者",quota:"1 人",
+    rules:["有效員點＝當班次獲得員點－當班次基本員點","以單班次計算，全天班也會把早班、晚班分開","當班次增加的時數會列入基本員點計算","以交接班時的既有規則劃分，以該項消費列計的人員為準"]},
+  A02:{title:"當週單班次銷售「最多」安全帽者（以頂為單位）",quota:"1 人",
+    rules:["以交接班時的既有規則劃分，以該項消費列計的人員為準","晚班人員於結帳後銷售，仍列入當班次頂數"]},
+  A03:{title:"當週獲得最多 5 星評價者",quota:"1 人",
+    rules:["顧客互動良好時，可請顧客評價並在評論中提到你的人員代號","可在權限範圍內贈送小贈品（亮霧清、PC 清、有包裝的帽袋 F085w）","若客人已用熟客券換過某物品，不要再送同一項"]},
+  A04:{title:"當週總計完成最多筆「客訂單」者",quota:"1 人（並列最高者皆得一次叫號權）",
+    rules:["客人來店取貨完成（含該客訂單內所有商品）才算結案","客人已取貨付款，但下班前沒有勾選「客戶取貨」核取方塊，該筆不列入計算"]},
+  A05:{title:"期間單一班次銷售最多鏡片數量者",quota:"1 人（並列最高者皆得一次叫號權）",
+    rules:["搭配「加價購」活動售出的鏡片，可加碼計算為 2 片"]},
+  A06:{title:"當週總計售出最多 KK 三花貓（各款）頂數者",quota:"1 人（並列最高者皆得一次叫號權）",
+    rules:["包含建立含 KK 三花貓（各款）的客訂單者，不需要在此週期內客人到店取貨也列入"]},
+  B01:{title:"多益英文測驗達標 5 分以上（單次滿分 10 分）",quota:"每人一次，人數不限",
+    rules:["任務期間內只要有一次成績 5 分以上（含）即獲得一次叫號權"]},
+  B02:{title:"期間內進貨件數最多者（單位：大件貨）",quota:"1 人（並列最高者皆得一次叫號權）",
+    rules:["以貨運公司送貨為準","老闆進行分貨或調貨不列入計算"]}
+};
+
+const DEMO_ROWS = [
+  {"任務編號":"A01","起始日期":"2026/10/12","截止日期":"2026/10/18","得獎者":"郁娟","得獎者叫號":""},
+  {"任務編號":"A02","起始日期":"2026/10/12","截止日期":"2026/10/18","得獎者":"姵綺","得獎者叫號":""},
+  {"任務編號":"A03","起始日期":"2026/10/12","截止日期":"2026/10/18","得獎者":"姵綺","得獎者叫號":""},
+  {"任務編號":"A04","起始日期":"2026/10/19","截止日期":"2026/10/25","得獎者":"","得獎者叫號":""},
+  {"任務編號":"A05","起始日期":"2026/10/19","截止日期":"2026/10/25","得獎者":"","得獎者叫號":""},
+  {"任務編號":"A06","起始日期":"2026/10/19","截止日期":"2026/10/25","得獎者":"","得獎者叫號":""},
+  {"任務編號":"B01","起始日期":"2026/10/12","截止日期":"2026/10/25","得獎者":"","得獎者叫號":""},
+  {"任務編號":"B02","起始日期":"2026/10/19","截止日期":"2026/11/1","得獎者":"","得獎者叫號":""}
+];
+
+/* =========================================================
+   工具函式
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function parseCSV(text){
+  const rows=[]; let row=[], cell="", q=false;
+  text = text.replace(/^\uFEFF/, "");
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(q){
+      if(ch==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; }
+      else cell+=ch;
+    }else if(ch==='"') q=true;
+    else if(ch===","){ row.push(cell); cell=""; }
+    else if(ch==="\n"||ch==="\r"){
+      if(ch==="\r" && text[i+1]==="\n") i++;
+      row.push(cell); cell=""; rows.push(row); row=[];
+    }else cell+=ch;
+  }
+  if(cell!==""||row.length){ row.push(cell); rows.push(row); }
+  const head = (rows.shift()||[]).map(h=>h.trim());
+  return rows.filter(r=>r.some(c=>c.trim()!=="")).map(r=>{
+    const o={}; head.forEach((h,i)=>o[h]=(r[i]??"").trim()); return o;
+  });
+}
+
+function normId(raw){
+  const m = String(raw||"").trim().toUpperCase().match(/^([A-Z])0*(\d+)$/);
+  return m ? m[1]+m[2].padStart(2,"0") : String(raw||"").trim().toUpperCase();
+}
+
+function parseDate(s){
+  const m = String(s||"").match(/(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);
+  return m ? new Date(+m[1], +m[2]-1, +m[3]) : null;
+}
+const today = () => { const d=new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
+const md = d => d ? `${d.getMonth()+1}/${d.getDate()}` : "";
+
+function splitNames(s){ return String(s||"").split(/[、,，;；\/\n]+/).map(x=>x.trim()).filter(Boolean); }
+
+/* 從叫號欄位抓出 1–75 的號碼，支援 "B7"、"7"、"B7、I20" */
+function extractNumbers(s){
+  const out=[]; const re=/(\d{1,2})/g; let m;
+  while((m=re.exec(String(s||"")))){ const n=+m[1]; if(n>=1&&n<=75) out.push(n); }
+  return out;
+}
+function letterOf(n){ return "BINGO"[Math.floor((n-1)/15)]; }
+
+/* =========================================================
+   資料載入與整理
+   ========================================================= */
+async function loadRows(){
+  const bust = u => u + (u.includes("?")?"&":"?") + "t=" + Date.now();
+  const get = async u => { const c=new AbortController(); const id=setTimeout(()=>c.abort(),9000);
+    try{ return await fetch(bust(u),{signal:c.signal}); } finally{ clearTimeout(id); } };
+  if(CONFIG.JSON_URL){
+    const r = await get(CONFIG.JSON_URL); if(!r.ok) throw new Error("JSON " + r.status);
+    const j = await r.json(); return {rows: Array.isArray(j)?j:(j.rows||[]), demo:false};
+  }
+  if(CONFIG.CSV_URL){
+    const r = await get(CONFIG.CSV_URL); if(!r.ok) throw new Error("CSV " + r.status);
+    return {rows: parseCSV(await r.text()), demo:false};
+  }
+  if(CONFIG.USE_DEMO_WHEN_EMPTY) return {rows: DEMO_ROWS, demo:true};
+  throw new Error("尚未設定資料來源");
+}
+
+function buildTasks(rows){
+  const t0 = today();
+  return rows.filter(r=>r["任務編號"]).map(r=>{
+    const id = normId(r["任務編號"]);
+    const fb = FALLBACK[id] || {};
+    const start = parseDate(r["起始日期"]), end = parseDate(r["截止日期"]);
+    const names = splitNames(r["得獎者"]);
+    const calls = String(r["得獎者叫號"]||"").split(/[、,，;；\/\n]+/).map(x=>x.trim());
+    const winners = names.map((n,i)=>({name:n, call: calls.length===names.length ? calls[i] : (calls.length===1?calls[0]:calls[i]||"")}));
+    const started = !start || t0>=start, ended = !!end && t0>end;
+    let status;
+    if(!started) status="soon";
+    else if(!ended) status="live";
+    else status = (winners.length && winners.every(w=>w.call)) ? "won" : "wait";
+    const daysLeft = (status==="live" && end) ? Math.round((end-t0)/864e5) : null;
+    return {
+      id, series:id[0], status, daysLeft, start, end, winners,
+      title: r["任務內容"] || fb.title || "任務內容公告後更新",
+      quota: r["名額限制"] || fb.quota || "",
+      rules: r["計算規則"] ? String(r["計算規則"]).split(/\n+/).map(x=>x.trim()).filter(Boolean) : (r["任務內容"] ? [] : (fb.rules||[])),
+      rawCalls: r["得獎者叫號"]
+    };
+  });
+}
+
+/* =========================================================
+   畫面
+   ========================================================= */
+const BADGE = {live:"進行中", wait:"待叫號", won:"已叫號", soon:"尚未開始"};
+const ORDER = ["live","soon","wait","won"];
+let TASKS=[], FILTER="all";
+
+function renderBoard(tasks){
+  const called=[]; tasks.forEach(t=>extractNumbers(t.rawCalls).forEach(n=>{ if(!called.includes(n)) called.push(n); }));
+  const last = called[called.length-1];
+  let html="";
+  "BINGO".split("").forEach((L,ri)=>{
+    let balls="";
+    for(let k=1;k<=15;k++){
+      const n=ri*15+k, on=called.includes(n);
+      balls += `<div class="ball${on?" on":""}${n===last?" last":""}" title="${L}${n}">${n}</div>`;
+    }
+    html += `<div class="brow" data-l="${L}"><div class="bletter">${L}</div><div class="bnums">${balls}</div></div>`;
+  });
+  $("#board").innerHTML = html;
+  $("#callCount").textContent = `已叫 ${called.length} / 75`;
+  $("#lastCall").innerHTML = last ? `最新號碼：<b>${letterOf(last)}${last}</b>` : "還沒有人叫號，快去完成任務吧！";
+}
+
+function ticketHTML(t){
+  const period = t.start&&t.end ? `${md(t.start)} – ${md(t.end)}` : "";
+  const left = t.daysLeft===null ? "" : (t.daysLeft===0 ? "今天截止" : `剩 ${t.daysLeft} 天`);
+  const winners = t.winners.length
+    ? `<div class="winners"><span class="lab">得獎者</span>${t.winners.map(w=>`<span class="chip">${esc(w.name)}${w.call?`<i>${esc(w.call)}</i>`:`<em class="pending">叫號待公布</em>`}</span>`).join("")}</div>`
+    : `<div class="winners nowin">${t.status==="soon"?"任務尚未開始":t.status==="wait"?"已截止，等待確認得獎者":"還沒有人獲得叫號權"}</div>`;
+  const open = (t.status==="live"||t.status==="soon") ? " open" : "";
+  const rules = t.rules.length ? `<details${open}><summary>計算規則</summary><ul>${t.rules.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></details>` : "";
+  return `<article class="ticket" data-series="${esc(t.series)}">
+    <div class="stub"><div class="tid">${esc(t.id)}</div><span class="badge ${t.status}">${BADGE[t.status]}</span></div>
+    <div class="body">
+      <h3>${esc(t.title)}</h3>
+      <div class="meta">${period?`<span>任務期間 ${period}</span>`:""}${left?`<span>${left}</span>`:""}${t.quota?`<span>名額 ${esc(t.quota)}</span>`:""}</div>
+      ${rules}${winners}
+    </div></article>`;
+}
+
+function renderTasks(){
+  const list = TASKS.filter(t => FILTER==="all" ? true : FILTER==="live" ? (t.status==="live"||t.status==="soon") : t.status===FILTER);
+  if(!list.length){ $("#tasks").innerHTML = `<div class="state">這個分類目前沒有任務。</div>`; return; }
+  /* 進行中排最前面，其次尚未開始、待叫號、已叫號；同組維持試算表順序 */
+  let html="";
+  ORDER.forEach(st=>{
+    const g = list.filter(t=>t.status===st);
+    if(!g.length) return;
+    html += `<h3 class="grp ${st}">${BADGE[st]}<span>${g.length}</span></h3>` + g.map(ticketHTML).join("");
+  });
+  $("#tasks").innerHTML = html;
+}
+
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
+  FILTER=b.dataset.f;
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-pressed", x===b));
+  renderTasks();
+}));
+
+(async function init(){
+  try{
+    const {rows,demo} = await loadRows();
+    TASKS = buildTasks(rows);
+    $("#demoNote").hidden = !demo;
+    renderBoard(TASKS); renderTasks();
+    const d=new Date(); $("#updated").textContent = `頁面更新於 ${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+  }catch(e){
+    console.error(e);
+    $("#tasks").innerHTML = `<div class="state err">讀不到資料。請確認試算表已「發佈到網路」，且連結格式正確。（${esc(e.message)}）</div>`;
+    renderBoard([]);
+  }
+})();
+</script>
+</body>
+</html>
